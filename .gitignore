@@ -1,2 +1,11 @@
 node_modules
 package-lock.json
+out/
+make.bat
+bin/
+obj/
+BBCode.deps.json
+BBCode.dll
+BBCode.exe
+BBCode.pdb
+BBCode.runtimeconfig.json

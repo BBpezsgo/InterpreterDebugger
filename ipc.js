@@ -13,7 +13,7 @@ class IPC extends EventEmitter {
     }
 
     Start() {
-        this.childProcess = spawn("../BBCode/bin/Debug/net6.0/BBCode.exe", {})
+        this.childProcess = spawn("./BBCode.exe", {})
 
         this.childProcess.on('close', (code, signal) => {
             console.log('Close:', code, signal)
