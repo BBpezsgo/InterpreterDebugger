@@ -1,0 +1,8 @@
+{
+  "devDependencies": {
+    "electron": "^21.3.1"
+  },
+  "scripts": {
+    "start": "electron main.js"
+  }
+}

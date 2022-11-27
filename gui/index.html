@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>BBCode Debugger</title>
+    
+    <script src="https://kit.fontawesome.com/d70969805a.js" crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="./third-party/jqx.base.css" type="text/css" />
+    <link rel="stylesheet" href="./dock-style.css" type="text/css" />
+    <link rel="stylesheet" href="./style.css" type="text/css" />
+    
+    <script type="text/javascript" src="./third-party/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="./third-party/jqxcore.js"></script>
+    <script type="text/javascript" src="./third-party/jqxribbon.js"></script>
+    <script type="text/javascript" src="./third-party/jqxwindow.js"></script>
+    <script type="text/javascript" src="./third-party/jqxlayout.js"></script>
+    <script type="text/javascript" src="./third-party/jqxdockinglayout.js"></script>
+    
+    <script type="text/javascript">
+        $(document).ready(function () {
+            // the 'layout' JSON array defines the internal structure of the docking layout
+            var layout = [{
+                type: 'layoutGroup',
+                orientation: 'horizontal',
+                items: [{
+                    type: 'layoutGroup',
+                    orientation: 'vertical',
+                    width: 400,
+                    items: [{
+                        type: 'documentGroup',
+                        height: 400,
+                        minHeight: 200,
+                        items: [{
+                            type: 'documentPanel',
+                            title: 'Code',
+                            contentContainer: 'Document1Panel'
+                        }]
+                    }, {
+                        type: 'tabbedGroup',
+                        height: 200,
+                        pinnedHeight: 30,
+                        items: [{
+                            type: 'layoutPanel',
+                            title: 'Output',
+                            contentContainer: 'OutputPanel'
+                        }, {
+                            type: 'layoutPanel',
+                            title: 'Error Log',
+                            contentContainer: 'ErrorLogPanel'
+                        }]
+                    }]
+                }, {
+                    type: 'tabbedGroup',
+                    width: 300,
+                    minWidth: 200,
+                    items: [{
+                        type: 'layoutPanel',
+                        title: 'Stack',
+                        contentContainer: 'StackPanel'
+                    }, {
+                        type: 'layoutPanel',
+                        title: 'Solution Explorer',
+                        contentContainer: 'SolutionExplorerPanel'
+                    }]
+                }]
+            }]
+            $('#jqxDockingLayout').jqxDockingLayout({ width: 700, height: 600, layout: layout })
+        })
+    </script>
+</head>
+<body>
+    <div id="toolbar">
+        <div class="btn" id="start-debug" style="color: #8ae28a;" title="Start">
+            <i class="fa-sharp fa-solid fa-play"></i>
+        </div>
+        <div class="btn btn-disabled" id="stop-debug" style="color: #f44b56;" title="Stop">
+            <i class="fa-sharp fa-solid fa-stop"></i>
+        </div>
+        <div class="btn btn-disabled" id="debug-step" style="color: #55aaff;" title="Execute next">
+            <i class="fa-sharp fa-solid fa-forward-step"></i>
+        </div>
+    </div>
+    <div id="jqxDockingLayout">
+        <!--documentGroup-->
+        <div data-container="Document1Panel">
+            <div id="code-content">
+                <ul></ul>
+            </div>
+        </div>
+        <!--bottom tabbedGroup-->
+        <div data-container="ErrorListPanel">
+            
+        </div>
+        <div data-container="OutputPanel">
+            <div id="output-content">
+                <ul></ul>
+            </div>
+        </div>
+        <div data-container="ErrorLogPanel">
+            <div id="error-log-content">
+                <ul></ul>
+            </div>
+        </div>
+        <!--right tabbedGroup-->
+        <div data-container="SolutionExplorerPanel">
+            
+        </div>
+        <div data-container="StackPanel">
+            <div id="stack-content">
+                <ul></ul>
+            </div>
+        </div>
+    </div>
+    <div id="statusbar">
+        <span id="status-label">Loading...</span>
+    </div>
+</body>
+</html>

@@ -1,0 +1,92 @@
+html, body {
+    color: #ddd;
+    background-color: #1f1f1f;
+}
+.jqx-widget-header {
+    border-color: #3d3d3d;
+    background: #1f1f1f;
+    color: #aaa;
+}
+.jqx-widget-content {
+    border-color: #3d3d3d;
+    background: #1f1f1f;
+    color: #fff;
+    border-radius: 0px;
+}
+
+.jqx-window-close-button {
+    margin-top: 0px;
+}
+
+.jqx-fill-state-hover {
+    background: unset;
+    border-color: transparent;
+}
+
+.jqx-docking-layout-group-floating .jqx-window-header {
+    border-color: #2d5eff;
+    background-color: #2d5eff !important;
+    background: #2d5eff !important;
+    color: #e0e7ff;
+}
+
+.jqx-docking-layout-group-floating {
+    border-color: #2d5eff !important;
+}
+
+.jqx-docking-layout-drop-overlay {
+    background-color: #2d5eff;
+    opacity: 0.5;
+}
+
+.jqx-rc-t {
+    -moz-border-radius-topleft: 0px;
+    -webkit-border-top-left-radius: 0px;
+    border-top-left-radius: 0px;
+    -moz-border-radius-topright: 0px;
+    -webkit-border-top-right-radius: 0px;
+    border-top-right-radius: 0px;
+}
+
+.jqx-window-header {
+    outline: none;
+    border-width: 0px;
+    border-bottom: 1px solid transparent;
+    overflow: hidden;
+    padding: 3px;
+    height: auto;
+    white-space: nowrap;
+    overflow: hidden;
+    user-select: none;
+}
+
+.jqx-icon-close {
+    background-image: url(./third-party/images/close.png);
+}
+.jqx-icon-close, .jqx-layout-pseudo-window-pin-icon, .jqx-layout-pseudo-window-pinned-icon {
+    cursor: default;
+    width: 16px;
+    height: 16px;
+}
+.jqx-icon-close:hover, .jqx-layout-pseudo-window-pin-icon:hover, .jqx-layout-pseudo-window-pinned-icon:hover {
+    background-color: #fffb;
+}
+.jqx-icon-close:active, .jqx-layout-pseudo-window-pin-icon:active, .jqx-layout-pseudo-window-pinned-icon:active {
+    background-color: #fff5;
+}
+
+body {
+    margin: 0;
+}
+
+.jqx-ribbon-item-bottom {
+    border-bottom: 3px solid transparent;
+}
+
+.jqx-ribbon-item-bottom:hover {
+    border-bottom: 3px solid #2d5eff;
+}
+
+.jqx-ribbon-item {
+    border-radius: 0px;
+}
