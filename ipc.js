@@ -12,8 +12,11 @@ class IPC extends EventEmitter {
         this.awaitAck = false
     }
 
-    Start() {
-        this.childProcess = spawn("./BBCode.exe", [ '..\\Interpreter\\TestFiles\\test5.bbc' ])
+    /** @param {string | undefined} file */
+    Start(file) {
+        const runFile = file || '..\\Interpreter\\TestFiles\\test5.bbc'
+
+        this.childProcess = spawn("./BBCode.exe", [ runFile ])
 
         this.childProcess.on('close', (code, signal) => {
             console.log('Close:', code, signal)
@@ -137,6 +140,15 @@ class IPC extends EventEmitter {
 
     Stop() {
         this.childProcess.kill()
+    }
+
+    IsRunning() {
+        if (this.childProcess === undefined) { return false }
+        if (this.childProcess === null) { return false }
+        if (this.childProcess.killed) { return false }
+        if (this.childProcess.exitCode === null) { return true }
+        else { return false }
+        return true
     }
 }
 

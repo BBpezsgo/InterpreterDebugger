@@ -202,3 +202,27 @@ body, html {
   margin-left: 4px;
   font-size: 14px;
 }
+
+#files-content > ul {
+  list-style: none;
+  padding: 5px 10px;
+}
+
+#files-content > ul > li {
+  border: 1px solid #3d3d3d;
+  padding: 2px;
+  margin-bottom: 5px;
+  cursor: pointer;
+}
+
+#files-content > ul > li:hover {
+  background-color: #fff1;
+}
+
+#files-content > ul > li:active {
+  background-color: #fff2;
+}
+
+#files-content > ul > li > i {
+  margin-right: 8px;
+}

@@ -10,6 +10,44 @@ window.addEventListener('DOMContentLoaded', () => {
     replaceText(`${type}-version`, process.versions[type])
   }
 
+  ipcRenderer.on('files', (e, args) => {
+    /** @type {string[]} */
+    const files = args
+    /** @type {HTMLUListElement} */
+    const content = document.querySelector('#files-content>ul')
+    content.innerHTML = ''
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i]
+
+      const newLi = document.createElement('li')
+      newLi.addEventListener('click', (e) => {
+        document.getElementById('status-label').innerText = 'Start Process...'
+        DisableButton('start-debug')
+        ipcRenderer.send('run-file', file)
+      })
+    
+      const newI = document.createElement('i')
+
+      const extension = file.includes('.') ? file.split('.')[file.split('.').length-1] : ''
+      
+      switch (extension) {
+        case 'bbc':
+          newI.className = 'fa-sharp fa-solid fa-file-code'
+          break
+      
+        default:
+          newI.className = 'fa-sharp fa-solid fa-file'
+          break
+      }
+
+      newLi.appendChild(newI)
+
+      newLi.appendChild(CreateSpan(file, 'se-file'))
+  
+      content.appendChild(newLi)
+    }
+  })
+
   ipcRenderer.on('con-out', (e, args) => {
     /** @type {{ Type: 'Debug'|'Error', Message: string }} */
     const log = args
@@ -236,18 +274,30 @@ window.addEventListener('DOMContentLoaded', () => {
     document.getElementById('status-label').innerText = 'Process Started'
   })
 
-
   ipcRenderer.on('unknown-message', (e, data) => {
-    const newLi = document.createElement('li')
+    const AddLine = function(line) {
+      const newLi = document.createElement('li')
+  
+      const newSpan = document.createElement('span')
+      newSpan.textContent = line
+      newLi.appendChild(newSpan)
+  
+      document.querySelector('#error-log-content ul').appendChild(newLi)
+  
+      const contentContainer = document.getElementById('error-log-content')
+      contentContainer.parentElement.scrollTo(0, contentContainer.parentElement.scrollHeight)
+    }
 
-    const newSpan = document.createElement('span')
-    newSpan.textContent = (typeof data === 'string') ? data : JSON.stringify(data, null, ' ')
-    newLi.appendChild(newSpan)
-
-    document.querySelector('#error-log-content ul').appendChild(newLi)
-
-    const contentContainer = document.getElementById('error-log-content')
-    contentContainer.parentElement.scrollTo(0, contentContainer.parentElement.scrollHeight)
+    if (typeof data === 'string') {
+      if (data.trim().split().includes('\n')) {
+        const lines = data.trim().split()
+      } else {
+        AddLine(data)
+      }
+      return
+    } else {
+      AddLine(JSON.stringify(data, null, ' '))
+    }
   })
 
   ipcRenderer.on('closed', (e, code) => {
@@ -262,6 +312,7 @@ window.addEventListener('DOMContentLoaded', () => {
   })
 
   ipcRenderer.send('on-loaded')
+  ipcRenderer.send('get-files')
   
   OnButtonClick('start-debug', () => {
     document.getElementById('status-label').innerText = 'Start Process...'

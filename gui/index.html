@@ -55,12 +55,12 @@
                     minWidth: 200,
                     items: [{
                         type: 'layoutPanel',
-                        title: 'Stack',
-                        contentContainer: 'StackPanel'
-                    }, {
-                        type: 'layoutPanel',
                         title: 'Solution Explorer',
                         contentContainer: 'SolutionExplorerPanel'
+                    }, {
+                        type: 'layoutPanel',
+                        title: 'Stack',
+                        contentContainer: 'StackPanel'
                     }]
                 }]
             }]
@@ -103,7 +103,13 @@
         </div>
         <!--right tabbedGroup-->
         <div data-container="SolutionExplorerPanel">
-            
+            <div id="files-content">
+                <ul>
+                    <li><i class="fa-sharp fa-solid fa-file-code"></i><span>xd</span></li>
+                    <li><i class="fa-sharp fa-solid fa-file-code"></i><span>xd</span></li>
+                    <li><i class="fa-sharp fa-solid fa-file-code"></i><span>xd</span></li>
+                </ul>
+            </div>
         </div>
         <div data-container="StackPanel">
             <div id="stack-content">

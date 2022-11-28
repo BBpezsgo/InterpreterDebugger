@@ -9,8 +9,9 @@ type Listener<T> = (arg: T) => void
 
 export class IPC extends EventEmitter {
     Send(message: Message): void
-    Start(): void
+    Start(file: string | undefined): void
     Stop(): void
+    IsRunning(): boolean
     
     on(event: 'message', listener: Listener<Message>): this
     on(event: 'unknown-message', listener: Listener<string>): this

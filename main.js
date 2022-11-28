@@ -1,6 +1,7 @@
 const { app, BrowserWindow, ipcMain } = require('electron')
 const path = require('path')
 const IPCManager = require('./ipc')
+const fs = require('fs')
 
 /** @type {BrowserWindow} */
 var win
@@ -79,4 +80,24 @@ ipcMain.on('debug-step', e => {
 
 ipcMain.on('stop-debug', e => {
   ipc.Stop()
+})
+
+ipcMain.on('get-files', e => {  
+  const testFilesFolder = '../Interpreter/TestFiles/'
+  const dir = fs.readdirSync(testFilesFolder)
+  win.webContents.send('files', dir)
+})
+
+ipcMain.on('run-file', (e, file) => {  
+  if (ipc.IsRunning()) { return }
+  ipc.Start(`..\\Interpreter\\TestFiles\\${file}`)
+  
+  setTimeout(() => {
+    ipc.Send({ type: 'get-comp-res' })
+  }, 1000)
+  
+  setInterval(() => {
+    ipc.Send({ type: 'get-intp-data' })
+    ipc.Send({ type: 'get-intp2-data' })
+  }, 1000)
 })
