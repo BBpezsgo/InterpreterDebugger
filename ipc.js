@@ -1,5 +1,6 @@
 const { spawn, ChildProcessWithoutNullStreams } = require('child_process')
 const { EventEmitter } = require('node:events')
+const settings = require('./settings').Get()
 
 class IPC extends EventEmitter {
     constructor() {
@@ -14,9 +15,9 @@ class IPC extends EventEmitter {
 
     /** @param {string | undefined} file */
     Start(file) {
-        const runFile = file || '..\\Interpreter\\TestFiles\\test5.bbc'
+        const runFile = file || settings.testFiles + 'test5.bbc'
 
-        this.childProcess = spawn("./BBCode.exe", [ runFile ])
+        this.childProcess = spawn(settings.path, [ runFile ])
 
         this.childProcess.on('close', (code, signal) => {
             console.log('Close:', code, signal)
@@ -67,7 +68,7 @@ class IPC extends EventEmitter {
                     })
                     return
                 } catch (error) {
-                    console.error(error, errorAtElement)
+                    console.log(error, errorAtElement)
                 }
             }
 
@@ -78,7 +79,7 @@ class IPC extends EventEmitter {
                 self.OnRecive(payloadObj)
                 return
             } catch (error) {
-                console.error(error, payloadText)
+                console.log(error, payloadText)
             }
 
             self.emit('unknown-message', payloadText)
@@ -123,7 +124,7 @@ class IPC extends EventEmitter {
             try {
                 this.childProcess.stdin.write(JSON.stringify(message) + "\n")
             } catch (error) {
-                console.error(error)
+                console.log(error)
                 this.emit('error', error)
                 return
             }
@@ -148,7 +149,6 @@ class IPC extends EventEmitter {
         if (this.childProcess.killed) { return false }
         if (this.childProcess.exitCode === null) { return true }
         else { return false }
-        return true
     }
 }
 

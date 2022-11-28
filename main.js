@@ -2,18 +2,33 @@ const { app, BrowserWindow, ipcMain } = require('electron')
 const path = require('path')
 const IPCManager = require('./ipc')
 const fs = require('fs')
+const settings = require('./settings').Get()
 
 /** @type {BrowserWindow} */
 var win
+/** @type {NodeJS.Timer | null} */
+var dataInterval = null
 
 function createWindow () {
   win = new BrowserWindow({
-    width: 716 - 10,
-    height: 659 + 30 - 10 + 23,
+    width: 716 - 16,
+    height: 659
+      + 30 // Top toolbar
+      - 10 // idk
+      + 23 // Bottom statusbar
+      - 49 // Windows toolbar
+    ,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js')
     },
-    resizable: false
+    resizable: false,
+    icon: './icon.ico',
+    titleBarStyle: 'hidden',
+    titleBarOverlay: {
+      color: '#1f1f1f',
+      symbolColor: '#999',
+      height: 30
+    }
   })
 
   win.loadFile('./gui/index.html')
@@ -62,16 +77,7 @@ ipcMain.on('on-loaded', e => {
 })
 
 ipcMain.on('start-debug', e => {
-  ipc.Start()
-  
-  setTimeout(() => {
-    ipc.Send({ type: 'get-comp-res' })
-  }, 1000)
-  
-  setInterval(() => {
-    ipc.Send({ type: 'get-intp-data' })
-    ipc.Send({ type: 'get-intp2-data' })
-  }, 1000)
+  StartDebug()
 })
 
 ipcMain.on('debug-step', e => {
@@ -79,25 +85,35 @@ ipcMain.on('debug-step', e => {
 })
 
 ipcMain.on('stop-debug', e => {
-  ipc.Stop()
+  StopDebug()
 })
 
 ipcMain.on('get-files', e => {  
-  const testFilesFolder = '../Interpreter/TestFiles/'
-  const dir = fs.readdirSync(testFilesFolder)
+  const dir = fs.readdirSync(settings.testFiles)
   win.webContents.send('files', dir)
 })
 
 ipcMain.on('run-file', (e, file) => {  
   if (ipc.IsRunning()) { return }
-  ipc.Start(`..\\Interpreter\\TestFiles\\${file}`)
+  StartDebug(settings.testFiles + `${file}`)
+})
+
+function StartDebug(path) {
+  ipc.Start(path)
   
   setTimeout(() => {
     ipc.Send({ type: 'get-comp-res' })
   }, 1000)
   
-  setInterval(() => {
+  dataInterval = setInterval(() => {
     ipc.Send({ type: 'get-intp-data' })
     ipc.Send({ type: 'get-intp2-data' })
   }, 1000)
-})
+}
+
+function StopDebug() {
+  if (dataInterval !== null) {
+    clearInterval(dataInterval)
+  }
+  ipc.Stop()
+}

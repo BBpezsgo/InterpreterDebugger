@@ -6810,7 +6810,7 @@ ol li .jqx-listmenu-item-label:before {
 }
 
 .jqx-kanban-handle {
-    cursor: move;
+    cursor: grab;
 }
 
 .jqx-kanban-clearing {

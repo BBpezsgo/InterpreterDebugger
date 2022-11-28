@@ -16,12 +16,12 @@
   margin: 0;
 }
 
-#output-content>ul>li.console-log-error>li {
+#output-content>ul>li.console-log-error {
   color: #ff0000;
 }
 
 #output-content>ul>li.console-log-debug {
-  color: #808080;
+  color: #707070;
 }
 
 ::-webkit-scrollbar {
@@ -86,7 +86,18 @@
   margin-left: 8px;
   display: inline-block;
 }
-
+#toolbar-drag {
+  -webkit-user-select: none;
+  -webkit-app-region: drag;
+  height: 30px;
+  width: calc(100% - 87px);
+  display: block;
+  float: right;
+  cursor: grab;
+}
+#toolbar-drag:active {
+  cursor: grabbing;
+}
 #toolbar {
   width: 100%;
   height: 30px;
@@ -209,18 +220,19 @@ body, html {
 }
 
 #files-content > ul > li {
-  border: 1px solid #3d3d3d;
-  padding: 2px;
-  margin-bottom: 5px;
+  border: 1px solid transparent;
+  padding: 1px 2px;
   cursor: pointer;
 }
 
 #files-content > ul > li:hover {
-  background-color: #fff1;
+  border-color: #70707088;
+  background-color: #3d3d3d88;
 }
 
 #files-content > ul > li:active {
-  background-color: #fff2;
+  border-color: #707070;
+  background-color: #3d3d3d;
 }
 
 #files-content > ul > li > i {

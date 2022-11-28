@@ -1,4 +1,4 @@
-const { ipcRenderer } = require('electron')
+const { ipcRenderer, app } = require('electron')
 
 window.addEventListener('DOMContentLoaded', () => {
   const replaceText = (selector, text) => {
@@ -49,29 +49,33 @@ window.addEventListener('DOMContentLoaded', () => {
   })
 
   ipcRenderer.on('con-out', (e, args) => {
+    const content = document.querySelector('#output-content ul')
+
+    const AddLine = function(line, className) {
+      const newLi = document.createElement('li')
+      newLi.className = className
+  
+      const newSpan = document.createElement('span')
+      newSpan.textContent = line
+      newLi.appendChild(newSpan)
+  
+      content.appendChild(newLi)
+    }
+
     /** @type {{ Type: 'Debug'|'Error', Message: string }} */
     const log = args
 
-    const newLi = document.createElement('li')
-    newLi.className = 'console-log-' + log.Type.toLowerCase()
-
-    if (log.Type !== 'Debug') {
-      const newIcon = document.createElement('i')
-      if (log.Type === 'Error') {
-        newIcon.className = 'fa-solid fa-circle-exclamation'
+    if (log.Message.trim().includes('\n')) {
+      const lines = log.Message.trim().split('\n')
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i]
+        if (line.trim().length === 0) { continue }
+        AddLine(line, 'console-log-' + log.Type.toLowerCase())
       }
-      newLi.appendChild(newIcon)
+    } else {
+      AddLine(log.Message, 'console-log-' + log.Type.toLowerCase())
     }
-
-    const newSpan = document.createElement('span')
-    newSpan.textContent = log.Message
-    newLi.appendChild(newSpan)
-
-    const contentContainer = document.getElementById('output-content')
-    const content = document.querySelector('#output-content ul')
-
-    content.appendChild(newLi)
-
+    
     contentContainer.parentElement.scrollTo(0, contentContainer.parentElement.scrollHeight)
   })
 
@@ -354,4 +358,20 @@ const DisableButton = function(id) {
 }
 const EnableButton = function(id) {
   document.getElementById(id).classList.remove('btn-disabled')
+}
+
+
+function GetDocumentTitle(baseID) {
+  const base = document.getElementById(baseID)
+
+  const a = base.parentElement.parentElement
+  if (a.classList.contains('jqx-widget-content') && a.classList.contains('jqx-ribbon-content')) {
+      return a.parentNode.children.item(0).children.item(0)
+  }
+
+  if (a.classList.contains('jqx-resize') && a.classList.contains('jqx-rc-all')) {
+      return a.children.item(0).children.item(0)
+  }
+
+  return null
 }

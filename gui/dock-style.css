@@ -90,3 +90,13 @@ body {
 .jqx-ribbon-item {
     border-radius: 0px;
 }
+
+.jqx-layout-group-document > ul:nth-child(1) {
+    border-top-color: transparent !important;
+    border-left-color: transparent !important;
+    border-right-color: transparent !important;
+}
+
+.jqx-ribbon-scrollbutton {
+    cursor: default;
+}
