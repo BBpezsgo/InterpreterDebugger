@@ -11,10 +11,19 @@
     "electron-squirrel-startup": "^1.0.0"
   },
   "scripts": {
-    "start": "electron-forge start",
+    "start": "electron .",
     "package": "electron-forge package",
-    "make": "electron-forge make"
+    "make": "electron-forge make",
+    "check-updates": "npm outdated"
   },
   "version": "1.0.0",
-  "main": "./main.js"
+  "main": "./main.js",
+  "author": {
+    "name": "BB",
+    "email": "bazsi5fel2@gmail.com",
+    "url": "https://bbpezsgo.github.io"
+  },
+  "name": "interpeter-debugger",
+  "description": "A debugger",
+  "keywords": []
 }
