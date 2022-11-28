@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{ea0096e4-2d87-4815-aa96-c6cee1d1a050}</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <ProjectView>ProjectFiles</ProjectView>
+    <ProjectView>ShowAllFiles</ProjectView>
     <StartupFile>main.js</StartupFile>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -19,12 +19,30 @@
     <Content Include=".gitignore" />
     <Content Include="Debugger.njsproj" />
     <Content Include="forge.config.js" />
+    <Content Include="gui\dock-style.css" />
+    <Content Include="gui\third-party\images\close.png" />
+    <Content Include="gui\third-party\images\icon-left.png" />
+    <Content Include="gui\third-party\images\icon-right.png" />
+    <Content Include="gui\third-party\images\icon-up.png" />
+    <Content Include="gui\third-party\images\pin.png" />
+    <Content Include="gui\third-party\images\pinned.png" />
+    <Content Include="gui\third-party\jquery-1.11.1.min.js" />
+    <Content Include="gui\third-party\jqx.base.css" />
+    <Content Include="gui\third-party\jqxcore.js" />
+    <Content Include="gui\third-party\jqxdockinglayout.js" />
+    <Content Include="gui\third-party\jqxlayout.js" />
+    <Content Include="gui\third-party\jqxribbon.js" />
+    <Content Include="gui\third-party\jqxwindow.js" />
+    <Content Include="icon.ico" />
     <Content Include="ipc.js" />
-    <Content Include="libman.json" />
     <Content Include="main.js" />
+    <Content Include="make.bat" />
     <Content Include="package-lock.json" />
     <Content Include="package.json" />
     <Content Include="preload.js" />
+    <Content Include="README.md" />
+    <Content Include="settings.js" />
+    <Content Include="settings.json" />
     <Content Include="start.bat" />
     <Content Include="gui\index.html" />
     <Content Include="gui\script.js" />
@@ -32,9 +50,12 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="gui" />
+    <Folder Include="gui\third-party\" />
+    <Folder Include="gui\third-party\images\" />
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="ipc.d.ts" />
+    <TypeScriptCompile Include="settings.d.ts" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsToolsV2.targets" />
