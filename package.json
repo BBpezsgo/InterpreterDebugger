@@ -14,7 +14,8 @@
     "start": "electron .",
     "package": "electron-forge package",
     "make": "electron-forge make",
-    "check-updates": "npm outdated"
+    "check-updates": "npm outdated",
+    "upload": "upload.bat"
   },
   "version": "1.0.0",
   "main": "./main.js",
