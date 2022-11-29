@@ -15,9 +15,9 @@ class IPC extends EventEmitter {
 
     /** @param {string | undefined} file */
     Start(file) {
-        const runFile = file || settings.testFiles + 'test5.bbc'
+        const runFile = file || settings.testFiles + 'test6.bbc'
 
-        this.childProcess = spawn(settings.path, [ runFile ])
+        this.childProcess = spawn(settings.path, [ "-debug", "-throw-errors", runFile ])
 
         this.childProcess.on('close', (code, signal) => {
             console.log('Close:', code, signal)

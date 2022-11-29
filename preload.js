@@ -129,7 +129,7 @@ window.addEventListener('DOMContentLoaded', () => {
       BasePointer: number
       CodePointer: number
       Stack: {
-        Value: string
+        Value: string | 'null'
         Type: 'INT'|'FLOAT'|'STRING'|'BOOLEAN'|'STRUCT'|'LIST'|'RUNTIME'
         Tag: string | null
       }[]
@@ -167,8 +167,16 @@ window.addEventListener('DOMContentLoaded', () => {
       const item = Interpeter.Stack[i]
       const newItem = document.createElement('li')
 
-      const lineNumber = CreateSpan(i.toString(), 'st-line-number')
-      newItem.appendChild(lineNumber)
+      if (Interpeter.BasePointer === i) {
+        const newI = document.createElement('i')
+        newI.className = 'fa-sharp fa-solid fa-chevron-right st-base-pointer'
+        newI.title = 'Base Pointer'
+        newItem.appendChild(newI)
+        
+        newItem.appendChild(CreateSpan(i.toString(), 'st-line-number st-line-number-with-base-pointer'))
+      } else {        
+        newItem.appendChild(CreateSpan(i.toString(), 'st-line-number'))
+      }
 
       if (item.Type === 'INT' || item.Type === 'FLOAT') {
         newItem.appendChild(CreateSpan(item.Value, 'st-num'))
@@ -179,7 +187,7 @@ window.addEventListener('DOMContentLoaded', () => {
       } else if (item.Type === 'STRUCT') {
         newItem.appendChild(CreateSpan('{ ... }', ''))
       } else if (item.Type === 'LIST') {
-        newItem.appendChild(CreateSpan('{ ... }', ''))
+        newItem.appendChild(CreateSpan('[ ... ]', ''))
       } else {
         newItem.appendChild(CreateSpan(item.Value, 'st-param'))
       }
@@ -199,7 +207,8 @@ window.addEventListener('DOMContentLoaded', () => {
       ClearGlobalVariablesInstruction: number
       CompiledCode: {
         Opcode: string
-        Parameter: string | number | null
+        Parameter: string | number | boolean | null
+        ParameterIsComplicated: boolean
         Tag: string
         AdditionParameter: string
         AdditionParameter2: number
@@ -248,15 +257,29 @@ window.addEventListener('DOMContentLoaded', () => {
           newSpan.style.paddingLeft = (indent * 8 + 2) + 'px'
           newSpan.appendChild(CreateSpan(instruction.Opcode, 'c-opcode'))
 
+          /** @type {HTMLSpanElement | null} */
+          var valueSpan = null
+
           if (typeof instruction.Parameter === 'number') {
-            newSpan.appendChild(CreateSpan(instruction.Parameter, 'c-num'))
+            valueSpan = CreateSpan(instruction.Parameter, 'c-num')
           } else if (typeof instruction.Parameter === 'string') {
-            newSpan.appendChild(CreateSpan('"' + instruction.Parameter + '"', 'c-str'))
+            if (instruction.ParameterIsComplicated) {
+              valueSpan = CreateSpan(instruction.Parameter, '')
+            } else {
+              valueSpan = CreateSpan('"' + instruction.Parameter + '"', 'c-str')
+            }
           } else if (typeof instruction.Parameter === 'boolean') {
-            newSpan.appendChild(CreateSpan(instruction.Parameter, 'c-bool'))
+            valueSpan = CreateSpan(instruction.Parameter, 'c-bool')
           } else {
-            newSpan.appendChild(CreateSpan(instruction.Parameter, 'c-param'))
+            valueSpan = CreateSpan(instruction.Parameter, 'c-param')
           }
+          
+          if (instruction.ParameterIsComplicated) {
+            valueSpan.classList.add('c-too-complicated')
+            valueSpan.title = 'Too complicated value'
+          }
+
+          newSpan.appendChild(valueSpan)
 
           if (instruction.AdditionParameter !== '' && instruction.AdditionParameter !== null) {
             newSpan.appendChild(CreateSpan('"' + instruction.AdditionParameter + '"', 'c-str'))
@@ -279,24 +302,31 @@ window.addEventListener('DOMContentLoaded', () => {
   })
 
   ipcRenderer.on('unknown-message', (e, data) => {
+    /** @param {string} line */
     const AddLine = function(line) {
       const newLi = document.createElement('li')
   
       const newSpan = document.createElement('span')
       newSpan.textContent = line
+      if (line.startsWith('at ')) {
+        newSpan.style.paddingLeft = '32px'
+      }
       newLi.appendChild(newSpan)
   
       document.querySelector('#error-log-content ul').appendChild(newLi)
   
-      const contentContainer = document.getElementById('error-log-content')
-      contentContainer.parentElement.scrollTo(0, contentContainer.parentElement.scrollHeight)
+      const contentContainer = document.getElementById('error-log-content').parentElement
+      contentContainer.scrollTo(0, contentContainer.scrollHeight)
     }
 
     if (typeof data === 'string') {
-      if (data.trim().split().includes('\n')) {
-        const lines = data.trim().split()
+      if (data.trim().includes('\n')) {
+        const lines = data.trim().split('\n')
+        for (let i = 0; i < lines.length; i++) {
+          AddLine(lines[i].trim())
+        }
       } else {
-        AddLine(data)
+        AddLine(data.trim())
       }
       return
     } else {

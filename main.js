@@ -95,6 +95,7 @@ ipcMain.on('get-files', e => {
 
 ipcMain.on('run-file', (e, file) => {  
   if (ipc.IsRunning()) { return }
+  console.log(`StartDebug('${settings.testFiles + file}')`)
   StartDebug(settings.testFiles + `${file}`)
 })
 
