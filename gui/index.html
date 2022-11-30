@@ -61,7 +61,7 @@
                         type: 'layoutPanel',
                         title: 'Stack',
                         contentContainer: 'StackPanel'
-                    }]
+                    }].reverse()
                 }]
             }]
             $('#jqxDockingLayout').jqxDockingLayout({ width: 700, height: 600, layout: layout })
@@ -119,10 +119,21 @@
         </div>
         <div data-container="StackPanel">
             <div id="stack-content">
-                <ul>
-                    <li><span class="st-line-number">0</span><span>xddd</span></li>
-                    <li><i class="fa-sharp fa-solid fa-chevron-right st-base-pointer"></i><span class="st-line-number-with-base-pointer st-line-number">0</span><span>xddd</span></li>
-                </ul>
+                <span>Memory used: <span id="stack-memory-used">0</span> bytes</span>
+                <table cellspacing="0">
+                    <tr>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                    <tr>
+                        <td><span>0</span></td>
+                        <td>xdd</td>
+                    </tr>
+                    <tr>
+                        <td><i class="fa-sharp fa-solid fa-share"></i><span>1</span></td>
+                        <td>xdd</td>
+                    </tr>
+                </table>
             </div>
         </div>
     </div>

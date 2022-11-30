@@ -6,6 +6,8 @@ window.addEventListener('DOMContentLoaded', () => {
     if (element) element.innerText = text
   }
 
+  document.querySelector('#stack-content table').innerHTML = ''
+
   for (const type of ['chrome', 'node', 'electron']) {
     replaceText(`${type}-version`, process.versions[type])
   }
@@ -128,6 +130,7 @@ window.addEventListener('DOMContentLoaded', () => {
      @type {{
       BasePointer: number
       CodePointer: number
+      StackMemorySize: number
       Stack: {
         Value: string | 'null'
         Type: 'INT'|'FLOAT'|'STRING'|'BOOLEAN'|'STRUCT'|'LIST'|'RUNTIME'
@@ -136,6 +139,8 @@ window.addEventListener('DOMContentLoaded', () => {
      }}
      */
     const Interpeter = data
+
+    document.getElementById('stack-memory-used').innerText = Interpeter.StackMemorySize.toString()
     
     const eContentCode = document.querySelector('#code-content ul')
 
@@ -161,42 +166,96 @@ window.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    const stackContent = document.querySelector('#stack-content ul')
+    /** @type {HTMLTableElement} */
+    const stackContent = document.querySelector('#stack-content table')
     stackContent.innerHTML = ''
+
+    const headerRow = document.createElement('tr')
+    headerRow.appendChild(document.createElement('th'))
+    headerRow.appendChild(document.createElement('th'))
+    stackContent.appendChild(headerRow)
+
+    var lastReturnValueIcon = null
+
+    var basePointerShown = false
     for (let i = 0; i < Interpeter.Stack.length; i++) {
       const item = Interpeter.Stack[i]
-      const newItem = document.createElement('li')
+      const newRow = document.createElement('tr')
+
+      const cell0 = document.createElement('td')
+      const cell1 = document.createElement('td')
 
       if (Interpeter.BasePointer === i) {
         const newI = document.createElement('i')
-        newI.className = 'fa-sharp fa-solid fa-chevron-right st-base-pointer'
+        newI.className = 'fa-sharp fa-solid fa-caret-right st-base-pointer st-base-pointer-active'
         newI.title = 'Base Pointer'
-        newItem.appendChild(newI)
-        
-        newItem.appendChild(CreateSpan(i.toString(), 'st-line-number st-line-number-with-base-pointer'))
-      } else {        
-        newItem.appendChild(CreateSpan(i.toString(), 'st-line-number'))
+        cell0.appendChild(newI)
+        basePointerShown = true
       }
 
+      cell0.appendChild(CreateSpan(i.toString(), ''))
+
       if (item.Type === 'INT' || item.Type === 'FLOAT') {
-        newItem.appendChild(CreateSpan(item.Value, 'st-num'))
+        cell1.appendChild(CreateSpan(item.Value, 'st-num'))
       } else if (item.Type === 'STRING') {
-        newItem.appendChild(CreateSpan('"' + item.Value + '"', 'st-str'))
+        cell1.appendChild(CreateSpan('"' + item.Value + '"', 'st-str'))
       } else if (item.Type === 'BOOLEAN') {
-        newItem.appendChild(CreateSpan(item.Value, 'st-bool'))
+        cell1.appendChild(CreateSpan(item.Value, 'st-bool'))
       } else if (item.Type === 'STRUCT') {
-        newItem.appendChild(CreateSpan('{ ... }', ''))
+        cell1.appendChild(CreateSpan('{ ... }', ''))
       } else if (item.Type === 'LIST') {
-        newItem.appendChild(CreateSpan('[ ... ]', ''))
+        cell1.appendChild(CreateSpan('[ ... ]', ''))
       } else {
-        newItem.appendChild(CreateSpan(item.Value, 'st-param'))
+        cell1.appendChild(CreateSpan(item.Value, 'st-param'))
       }
 
       if (item.Tag !== null) {
-        newItem.appendChild(CreateSpan(item.Tag, 'st-tag'))
+        if (item.Tag === 'return value' && i < Interpeter.BasePointer) {
+          const newI = document.createElement('i')
+          newI.className = 'fa-solid fa-share st-return-value'
+          newI.title = 'Return Value'
+          newI.style.transform = 'rotate(-90deg)'
+          cell1.appendChild(newI)
+          lastReturnValueIcon = newI
+        } else if (item.Tag === 'saved base pointer') {
+          const newI = document.createElement('i')
+          newI.className = 'fa-sharp fa-solid fa-caret-right st-base-pointer'
+          newI.title = 'Saved Base Pointer'
+          try {
+            stackContent.querySelectorAll('tr')[Number.parseInt(item.Value)+1].querySelector('td').appendChild(newI)
+          } catch (err) { }
+          cell1.appendChild(CreateSpan(item.Tag, 'st-tag'))
+        } else {
+          cell1.appendChild(CreateSpan(item.Tag, 'st-tag'))
+        }
       }
+
+      newRow.appendChild(cell0)
+      newRow.appendChild(cell1)
     
-      stackContent.appendChild(newItem)
+      stackContent.appendChild(newRow)
+    }
+
+    if (lastReturnValueIcon) {
+      lastReturnValueIcon.classList.add('st-return-value-active')
+    }
+
+    if (basePointerShown === false && Interpeter.BasePointer === Interpeter.Stack.length) {    
+      const newRow = document.createElement('tr')
+
+      const cell0 = document.createElement('td')
+      const cell1 = document.createElement('td')
+
+      const newI = document.createElement('i')
+      newI.className = 'fa-sharp fa-solid fa-caret-right st-base-pointer st-base-pointer-active'
+      newI.title = 'Base Pointer'
+      cell0.appendChild(newI)
+      basePointerShown = true
+
+      newRow.appendChild(cell0)
+      newRow.appendChild(cell1)
+    
+      stackContent.appendChild(newRow)    
     }
   })
 
@@ -335,7 +394,7 @@ window.addEventListener('DOMContentLoaded', () => {
   })
 
   ipcRenderer.on('closed', (e, code) => {
-    document.querySelector('#stack-content ul').innerHTML = ''
+    document.querySelector('#stack-content table').innerHTML = ''
     document.querySelector('#code-content ul').innerHTML = ''
 
     DisableButton('stop-debug')
