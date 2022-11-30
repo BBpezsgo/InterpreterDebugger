@@ -88,7 +88,17 @@ ipcMain.on('stop-debug', e => {
   StopDebug()
 })
 
-ipcMain.on('get-files', e => {  
+ipcMain.on('toolbar-dev-tools', e => {
+  win.webContents.openDevTools({
+    mode: 'undocked'
+  })
+})
+
+ipcMain.on('get-files', e => {
+  if (!fs.existsSync(settings.testFiles)) {
+    win.webContents.send('files', [])
+    return
+  }
   const dir = fs.readdirSync(settings.testFiles)
   win.webContents.send('files', dir)
 })

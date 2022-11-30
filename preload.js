@@ -367,6 +367,10 @@ window.addEventListener('DOMContentLoaded', () => {
     DisableButton('stop-debug')
     ipcRenderer.send('debug-step')
   })
+
+  OnButtonClick('toolbar-dev-tools', () => {
+    ipcRenderer.send('toolbar-dev-tools')
+  })
   
   document.getElementById('status-label').innerText = 'Ready'
 })
