@@ -50,28 +50,29 @@ app.on('window-all-closed', () => {
   }
 })
 
-const ipc = new IPCManager.IPC()
+const processInterpreter = new IPCManager.IPC()
+const processEditor = new IPCManager.IPC()
 
 ipcMain.on('on-loaded', e => {
-  ipc.on('message', function(message) {
+  processInterpreter.on('message', function(message) {
     if (message.type === 'con-out' || message.type === 'intp-data' || message.type === 'intp2-data' || message.type === 'comp-res' || message.type === 'started') {
       win.webContents.send(message.type, message.data)
     }
   })
   
-  ipc.on('unknown-message', function(message) {
+  processInterpreter.on('unknown-message', function(message) {
     win.webContents.send('unknown-message', message)
   })
   
-  ipc.on('error', function(error) {
+  processInterpreter.on('error', function(error) {
     win.webContents.send('unknown-message', error)
   })
   
-  ipc.on('error-message', function(error) {
+  processInterpreter.on('error-message', function(error) {
     win.webContents.send('unknown-message', error)
   })
   
-  ipc.on('closed', function(code) {
+  processInterpreter.on('closed', function(code) {
     win.webContents.send('closed', code)
   })
 })
@@ -81,7 +82,7 @@ ipcMain.on('start-debug', e => {
 })
 
 ipcMain.on('debug-step', e => {
-  ipc.Send({ type: 'intp-update' })
+  processInterpreter.Send({ type: 'intp-update' })
 })
 
 ipcMain.on('stop-debug', e => {
@@ -104,21 +105,21 @@ ipcMain.on('get-files', e => {
 })
 
 ipcMain.on('run-file', (e, file) => {  
-  if (ipc.IsRunning()) { return }
+  if (processInterpreter.IsRunning()) { return }
   console.log(`StartDebug('${settings.testFiles + file}')`)
   StartDebug(settings.testFiles + `${file}`)
 })
 
 function StartDebug(path) {
-  ipc.Start(path)
+  if (processInterpreter.IsRunning() === false) { processInterpreter.Start(path, 'DEBUG') }
   
   setTimeout(() => {
-    ipc.Send({ type: 'get-comp-res' })
+    processInterpreter.Send({ type: 'get-comp-res' })
   }, 1000)
   
   dataInterval = setInterval(() => {
-    ipc.Send({ type: 'get-intp-data' })
-    ipc.Send({ type: 'get-intp2-data' })
+    processInterpreter.Send({ type: 'get-intp-data' })
+    processInterpreter.Send({ type: 'get-intp2-data' })
   }, 1000)
 }
 
@@ -126,5 +127,65 @@ function StopDebug() {
   if (dataInterval !== null) {
     clearInterval(dataInterval)
   }
-  ipc.Stop()
+  processInterpreter.Stop()
+}
+
+ipcMain.on('editor-text', (e, text) => { codeEditorCurrentText = text })
+
+var codeEditorLastText = ''
+var codeEditorCurrentText = ''
+var codeEditorUpdate = setInterval(() => {
+  if (codeEditorLastText !== codeEditorCurrentText) {
+    OnCodeEditor(codeEditorCurrentText)
+    codeEditorLastText = codeEditorCurrentText
+  }
+}, 500)
+
+/** @param {string} text */
+function OnCodeEditor(text) {
+  if (processEditor.IsRunning() === false) {
+    console.log('Start editor')
+    const path = './editing.temp.txt'
+    processEditor.Start(path, 'EDITOR')
+    setTimeout(() => {
+      CodeEditorSend(text)
+    }, 1000)
+
+    processEditor.on('message', function(message) {
+      console.log(message)
+      if (message.type === 'result') {
+        win.webContents.send('editor-tokens', message.data)
+      }
+    })
+    
+    processEditor.on('unknown-message', function(message) {
+      console.log(message)
+    })
+    
+    processEditor.on('error', function(error) {
+      console.log(error)
+    })
+    
+    processEditor.on('error-message', function(error) {
+      console.log(error)
+    })
+    
+    processEditor.on('closed', function(code) {
+      console.log('Editor closed')
+    })
+  } else {
+    console.log('On edit')
+    CodeEditorSend(text)
+  }
+}
+
+/** @param {string} text */
+function CodeEditorSend(text) {
+  const path = './editing.temp.txt'
+  console.log(text.replace(/\r/g, '\\r').replace(/\n/g, '\\n'))
+  fs.writeFile(path, text.replace(/\r/g, '\n\r'), { encoding: 'utf-8' }, (err) => {
+    if (err) { console.log(err); return }
+    console.log('Get tokens')
+    processEditor.Send({ type: 'raw-code', data: '' })
+  })
 }

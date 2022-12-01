@@ -1,10 +1,12 @@
-const { ipcRenderer, app } = require('electron')
+const { ipcRenderer, app, ipcMain } = require('electron')
 
 window.addEventListener('DOMContentLoaded', () => {
   const replaceText = (selector, text) => {
     const element = document.getElementById(selector)
     if (element) element.innerText = text
   }
+
+  SetupCodeEditor(document.getElementById('editing'))
 
   document.querySelector('#stack-content table').innerHTML = ''
 
@@ -432,6 +434,132 @@ window.addEventListener('DOMContentLoaded', () => {
   })
   
   document.getElementById('status-label').innerText = 'Ready'
+
+  ipcRenderer.on('editor-tokens', (e, result) => {
+    /**
+    @type {{
+      Text: string
+      Type: string
+      Subtype: string
+      Start: number
+      End: number
+      Col: number
+      Line: number
+    }[]}
+    */
+    const tokens = result['Tokens']
+    /**
+    @type {{
+      Message: string
+      Start: number
+      End: number
+    } | null}
+    */
+    const error = result['Error']
+
+    var result = ''
+
+    var currentCol = 0
+    var currentLine = 1
+
+    /** @param {string} text */
+    const ParseText = function(text) {
+      return text
+        .replace(new RegExp("&", "g"), "&amp;")
+        .replace(new RegExp("<", "g"), "&lt;")
+        .replace(new RegExp(">", "g"), "&mt;")
+        .replace(new RegExp(" ", "g"), "&nbsp;")
+        .replace(new RegExp("\t", "g"), "&nbsp;&nbsp;")
+        .replace(new RegExp("\n", "g"), "<br>")
+    }
+
+    /** @param {number} to */
+    const AddSpaces = function(to) {
+      while (currentCol < to) {
+        result += '&nbsp;'
+        currentCol++
+      }
+    }
+
+    /** @param {number} to */
+    const AddLines = function(to) {
+      while (currentLine < to) {
+        result += '<br>'
+        currentLine++
+      }
+    }
+
+    /** @param {string} text */
+    const AddText = function(text) {
+      currentCol += text.length
+      result += ParseText(text)
+    }
+
+    /** @param {string} text */
+    const AddLabel = function(text, className) {
+      currentCol += text.length
+      result += `<span class="t-${className}">${ParseText(text)}</span>`
+    }
+
+    var errorStartPlaced = false
+    var errorEndPlaced = false
+    for (let i = 0; i < tokens.length; i++) {
+      const token = tokens[i]
+
+      if (error !== null) {
+        if (errorStartPlaced === false) {
+          if (token.Start >= error.Start) {
+            result += `<span class="t-error">`
+            errorStartPlaced = true
+          }
+        } else if (errorEndPlaced === false) {
+          if (token.Start > error.End) {
+            result += '</span>'
+            errorEndPlaced = true
+          }
+        }
+      }
+
+      if (token.Type === 'WHITESPACE') {
+        AddText(token.Text)
+      } else if (token.Type === 'LINEBREAK') {
+        AddText('\n')
+      } else if (token.Type === 'LITERAL_NUMBER') {
+        AddLabel(token.Text, 'number')
+      } else if (token.Type === 'LITERAL_FLOAT') {
+        AddLabel(token.Text, 'number')
+      } else if (token.Type === 'LITERAL_STRING') {
+        AddLabel(`"${token.Text}"`, 'string')
+      } else if (token.Type === 'IDENTIFIER') {
+        if (token.Subtype === 'Keyword') {
+          AddLabel(token.Text, 'keyword')
+        } else if (token.Subtype === 'VariableName') {
+          AddLabel(token.Text, 'var')
+        } else if (token.Subtype === 'MethodName') {
+          AddLabel(token.Text, 'function')
+        } else if (token.Subtype === 'Type') {
+          AddLabel(token.Text, 'class')
+        } else if (token.Subtype === 'Struct') {
+          AddLabel(token.Text, 'struct')
+        } else if (token.Subtype === 'Statement') {
+          AddLabel(token.Text, 'statement')
+        } else if (token.Subtype === 'Library') {
+          AddLabel(token.Text)
+        } else {
+          AddText(token.Text)
+        }
+      } else {
+        AddText(token.Text)
+      }
+    }
+
+    if (errorStartPlaced === true && errorEndPlaced === false) {
+      result += '</span>'
+    }
+    
+    const resultElement = document.querySelector("#highlighting-content")
+    resultElement.innerHTML = result
+  })
 })
 
 /** @param {(this: HTMLElement, ev: MouseEvent)=>void} callback */
@@ -467,4 +595,48 @@ function GetDocumentTitle(baseID) {
   }
 
   return null
+}
+
+/** @param {HTMLTextAreaElement} element */
+function SetupCodeEditor(element) {
+  element.addEventListener('input', (e) => {
+    CodeEditorUpdate(element.value)
+    CodeEditorSyncScroll(element)
+  })
+  element.addEventListener('scroll', (e) => {
+    CodeEditorSyncScroll(element)
+  })
+  element.addEventListener('wheel', (e) => {
+    CodeEditorSyncScroll(element)
+  })
+  element.addEventListener('keydown', (e) => {
+    CodeEditorCheckTab(element, e)
+  })
+}
+
+/** @param {string} text */
+function CodeEditorUpdate(text) {  
+  ipcRenderer.send('editor-text', text)
+}
+
+/** @param {HTMLTextAreaElement} element */
+function CodeEditorSyncScroll(element) {
+  const resultElement = document.querySelector("#highlighting")
+  resultElement.scrollTop = element.scrollTop
+  resultElement.scrollLeft = element.scrollLeft
+}
+
+/** @param {HTMLTextAreaElement} element @param {KeyboardEvent} event */
+function CodeEditorCheckTab(element, event) {
+  let code = element.value;
+  if (event.key === "Tab") {
+    event.preventDefault()
+    let beforeTab = code.slice(0, element.selectionStart)
+    let afterTab = code.slice(element.selectionEnd, element.value.length)
+    let cursorPos = element.selectionStart + 2
+    element.value = beforeTab + "  " + afterTab
+    element.selectionStart = cursorPos
+    element.selectionEnd = cursorPos
+    CodeEditorUpdate(element.value)
+  }
 }

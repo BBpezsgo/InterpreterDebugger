@@ -11,13 +11,19 @@ class IPC extends EventEmitter {
         this.outMessages = []
         /** @type {boolean} */
         this.awaitAck = false
+        /** @type {string} */
+        this.rawInput = ''
     }
 
-    /** @param {string | undefined} file */
-    Start(file) {
+    /** @param {string | undefined} file @param {'DEBUG' | 'EDITOR'} type */
+    Start(file, type) {
         const runFile = file || settings.testFiles + 'test6.bbc'
 
-        this.childProcess = spawn(settings.path, [ "-debug", "-throw-errors", runFile ])
+        if (type === 'EDITOR') {
+            this.childProcess = spawn(settings.path, [ "-code-editor", runFile ])
+        } else if (type === 'DEBUG') {
+            this.childProcess = spawn(settings.path, [ "-debug", "-throw-errors", runFile ])
+        }
 
         this.childProcess.on('close', (code, signal) => {
             console.log('Close:', code, signal)
@@ -53,37 +59,38 @@ class IPC extends EventEmitter {
 
         const self = this
         this.childProcess.stdout.on('data', function (payload) {
-            const payloadText = (payload.toString() + '').trim()
+            self.rawInput += payload.toString()
 
-            if (payloadText.includes('\n')) {
-                const payloads = payloadText.split('\n')
-                var errorAtElement = null
-                try {
-                    payloads.forEach(element => {
-                        errorAtElement = element.trim()
-                        /** @type {{type:string,data:any}} */
-                        const payloadObj = JSON.parse(element.trim())
-
-                        self.OnRecive(payloadObj)
-                    })
-                    return
-                } catch (error) {
-                    console.log(error, errorAtElement)
+            /** @param {string} line */
+            const ParseLine = function(line) {
+                if (line.trim().length === 0) { return }
+                self.OnRecive(JSON.parse(line.trim()))
+            }
+            
+            if (self.rawInput.includes('\n')) {
+                while (self.rawInput.includes('\n')) {
+                    const firstLine = self.rawInput.split('\n')[0]
+                    self.rawInput = self.rawInput.substring(firstLine.length + 1)
+                    try {
+                        ParseLine(firstLine)
+                    } catch (error) {
+                        console.log(error, firstLine)
+                    }
                 }
+            } else {
+                console.log('Wait end of message')
+                return
             }
 
             try {
-                /** @type {{type:string,data:any}} */
-                const payloadObj = JSON.parse(payloadText)
-
-                self.OnRecive(payloadObj)
+                ParseLine(self.rawInput)
                 return
             } catch (error) {
-                console.log(error, payloadText)
+                console.log(error, self.rawInput)
             }
 
-            self.emit('unknown-message', payloadText)
-            console.log('< [U] ', payloadText)
+            self.emit('unknown-message', self.rawInput)
+            console.log('< [U] ', self.rawInput)
         })
 
         /** @type {{type:string;data:any}[]} */

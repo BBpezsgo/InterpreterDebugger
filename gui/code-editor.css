@@ -1,0 +1,82 @@
+#editing,
+#highlighting {
+  margin: 10px;
+  padding: 10px;
+  border: 0;
+  height: calc(100% - 40px);
+}
+
+#editing,
+#highlighting,
+#highlighting * {
+  font-size: 16px;
+  font-family: monospace;
+  font-weight: 600;
+  line-height: 18px;
+  tab-size: 2;
+}
+
+
+#editing,
+#highlighting {
+  grid-row-start: 1;
+  grid-column-start: 1;
+}
+
+#editing {
+  z-index: 1;
+}
+
+#highlighting {
+  z-index: 0;
+}
+
+#editing {
+  color: transparent;
+  background: transparent;
+  caret-color: white;
+}
+
+#editing,
+#highlighting {
+  overflow: auto;
+  white-space: nowrap;
+}
+
+#editing {
+  resize: none;
+  outline: none;
+}
+
+#highlighting span.t-number {
+  color: #b5cea8;
+}
+#highlighting span.t-keyword {
+  color: #569cd5;
+}
+#highlighting span.t-function {
+  color: #dcdcaa;
+}
+#highlighting span.t-var {
+  color: #99dbfe;
+}
+#highlighting span.t-struct {
+  color: #86c691;
+}
+#highlighting span.t-string {
+  color: #d69d85;
+}
+#highlighting span.t-class {
+  color: #4dc9b0;
+}
+#highlighting span.t-statement {
+  color: #d8a0dc;
+}
+#highlighting span.t-error {
+  text-decoration-style: wavy;
+  text-decoration-line: underline;
+  text-decoration-color: #e03f39;
+}
+#highlighting span.t-warn {
+  color: #93d87b;
+}
