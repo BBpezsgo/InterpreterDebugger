@@ -10,3 +10,7 @@ BBCode.exe
 BBCode.pdb
 BBCode.runtimeconfig.json
 editing.temp.txt
+output.dll
+Microsoft.CodeAnalysis.CSharp.dll
+System.CodeDom.dll
+Microsoft.CodeAnalysis.dll
