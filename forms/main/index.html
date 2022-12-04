@@ -5,16 +5,16 @@
     
     <script src="https://kit.fontawesome.com/d70969805a.js" crossorigin="anonymous"></script>
 
-    <link rel="stylesheet" href="./third-party/jqx.base.css" type="text/css" />
-    <link rel="stylesheet" href="./dock-style.css" type="text/css" />
-    <link rel="stylesheet" href="./style.css" type="text/css" />
+    <link rel="stylesheet" href="../../gui/third-party/jqx.base.css" type="text/css" />
+    <link rel="stylesheet" href="../../gui/dock-style.css" type="text/css" />
+    <link rel="stylesheet" href="../../gui/style.css" type="text/css" />
     
-    <script type="text/javascript" src="./third-party/jquery-1.11.1.min.js"></script>
-    <script type="text/javascript" src="./third-party/jqxcore.js"></script>
-    <script type="text/javascript" src="./third-party/jqxribbon.js"></script>
-    <script type="text/javascript" src="./third-party/jqxwindow.js"></script>
-    <script type="text/javascript" src="./third-party/jqxlayout.js"></script>
-    <script type="text/javascript" src="./third-party/jqxdockinglayout.js"></script>
+    <script type="text/javascript" src="../../gui/third-party/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="../../gui/third-party/jqxcore.js"></script>
+    <script type="text/javascript" src="../../gui/third-party/jqxribbon.js"></script>
+    <script type="text/javascript" src="../../gui/third-party/jqxwindow.js"></script>
+    <script type="text/javascript" src="../../gui/third-party/jqxlayout.js"></script>
+    <script type="text/javascript" src="../../gui/third-party/jqxdockinglayout.js"></script>
     
     <script type="text/javascript">
         $(document).ready(function () {
@@ -134,19 +134,43 @@
         </div>
         <div data-container="StackPanel">
             <div id="stack-content">
-                <span>Memory used: <span id="stack-memory-used">0</span> bytes</span>
+                <span>Memory used: <span id="stack-memory-used">12</span> bytes</span>
+                <span id="stack-base-pointer-value" style="display:none">2</span>
                 <table cellspacing="0">
-                    <tr>
-                        <th></th>
-                        <th></th>
+                    <tr><th></th><th></th></tr>
+                    <tr id="stack-row-i-0">
+                        <td>
+                            <span class="">0</span>
+                            <i class="fa-sharp fa-solid fa-caret-right st-base-pointer" title="Saved Base Pointer"></i>
+                        </td>
+                        <td>
+                            <span class="st-num">0</span>
+                            <i class="fa-solid fa-share st-return-value st-return-value-active" title="Return Value" style="transform: rotate(-90deg);"></i>
+                        </td>
                     </tr>
-                    <tr>
-                        <td><span>0</span></td>
-                        <td>xdd</td>
+                    <tr id="stack-row-i-1">
+                        <td>
+                            <span class="">1</span>
+                        </td>
+                        <td>
+                            <span class="st-num">0</span>
+                            <span class="st-tag">saved base pointer</span>
+                        </td>
                     </tr>
-                    <tr>
-                        <td><i class="fa-sharp fa-solid fa-share"></i><span>1</span></td>
-                        <td>xdd</td>
+                    <tr id="stack-row-i-2" class="stack-item-higlighted">
+                        <td>
+                            <i class="fa-sharp fa-solid fa-caret-right st-base-pointer st-base-pointer-active" title="Base Pointer"></i>
+                            <span class="">2</span>
+                        </td>
+                        <td>
+                            <span class="st-num">0</span>
+                            <span class="stack-label-var" title="Variable">
+                                <div style="-webkit-mask-image: url(&quot;../../gui/var.png&quot;); -webkit-mask-repeat: no-repeat; -webkit-mask-size: contain; display: inline-block;">
+                                    <div style="width: 16px; height: 16px; background-color: rgb(255, 0, 0);"></div>
+                                </div>
+                                <span class="">i</span>
+                            </span>
+                        </td>
                     </tr>
                 </table>
             </div>

@@ -6,7 +6,13 @@ window.addEventListener('DOMContentLoaded', () => {
     if (element) element.innerText = text
   }
 
-  SetupCodeEditor(document.getElementById('editing'))
+  function GenerateIcon(iconName) {
+    const newIcon = document.createElement('i')
+    newIcon.className = iconName
+    return newIcon
+  }
+
+  // SetupCodeEditor(document.getElementById('editing'))
 
   document.querySelector('#stack-content table').innerHTML = ''
 
@@ -143,6 +149,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const Interpeter = data
 
     document.getElementById('stack-memory-used').innerText = Interpeter.StackMemorySize.toString()
+    document.getElementById('stack-base-pointer-value').innerText = Interpeter.BasePointer
     
     const eContentCode = document.querySelector('#code-content ul')
 
@@ -183,6 +190,7 @@ window.addEventListener('DOMContentLoaded', () => {
     for (let i = 0; i < Interpeter.Stack.length; i++) {
       const item = Interpeter.Stack[i]
       const newRow = document.createElement('tr')
+      newRow.id = 'stack-row-i-' + i
 
       const cell0 = document.createElement('td')
       const cell1 = document.createElement('td')
@@ -227,6 +235,26 @@ window.addEventListener('DOMContentLoaded', () => {
             stackContent.querySelectorAll('tr')[Number.parseInt(item.Value)+1].querySelector('td').appendChild(newI)
           } catch (err) { }
           cell1.appendChild(CreateSpan(item.Tag, 'st-tag'))
+        } else if (item.Tag.startsWith('var.')) {
+          const varName = item.Tag.substring(4)
+          const newElement = document.createElement('span')
+          const newIcon = GenerateCustomIcon('../../gui/var.png', '#f00', 16, 16)
+          newIcon.style.display = 'inline-block'
+          newElement.appendChild(newIcon)
+          newElement.appendChild(CreateSpan(varName, ''))
+          newElement.className = 'stack-label-var'
+          newElement.title = 'Variable'
+          cell1.appendChild(newElement)
+        } else if (item.Tag.startsWith('param.') && i < Interpeter.BasePointer) {
+          const varName = item.Tag.substring(6)
+          const newElement = document.createElement('span')
+          const newIcon = GenerateCustomIcon('../../gui/var.png', '#f00', 16, 16)
+          newIcon.style.display = 'inline-block'
+          newElement.appendChild(newIcon)
+          newElement.appendChild(CreateSpan(varName, ''))
+          newElement.className = 'stack-label-var'
+          newElement.title = 'Parameter'
+          cell1.appendChild(newElement)
         } else {
           cell1.appendChild(CreateSpan(item.Tag, 'st-tag'))
         }
@@ -234,6 +262,10 @@ window.addEventListener('DOMContentLoaded', () => {
 
       newRow.appendChild(cell0)
       newRow.appendChild(cell1)
+
+      if (document.getElementsByClassName('stack-higlighted-index-' + i).length > 0) {
+        newRow.classList.add('stack-item-higlighted')
+      }
     
       stackContent.appendChild(newRow)
     }
@@ -299,6 +331,7 @@ window.addEventListener('DOMContentLoaded', () => {
         const instruction = CompilerResult.CompiledCode[i]
         const newItem = document.createElement('li')
         newItem.classList.add('c-code')
+        newItem.id = 'c-code-i-' + i
 
         const lineNumber = CreateSpan(i.toString(), 'c-line-number')
         newItem.appendChild(lineNumber)
@@ -340,7 +373,117 @@ window.addEventListener('DOMContentLoaded', () => {
             valueSpan.title = 'Too complicated value'
           }
 
+          if (instruction.Opcode === 'JUMP_BY_IF_FALSE' || instruction.Opcode === 'JUMP_BY_IF_TRUE' || instruction.Opcode === 'JUMP_BY' || instruction.Opcode === 'CALL') {
+            if (typeof instruction.Parameter === 'number') {
+              valueSpan.addEventListener('mouseenter', (e) => {
+                document.getElementById('c-code-i-' + (instruction.Parameter + i)).classList.add('c-jump-to-target')
+              })
+              valueSpan.addEventListener('mouseleave', (e) => {
+                document.getElementById('c-code-i-' + (instruction.Parameter + i)).classList.remove('c-jump-to-target')
+              })
+              valueSpan.addEventListener('click', (e) => {
+                e.target.classList.add('c-jump-to-from-stay')
+                document.getElementById('c-code-i-' + (instruction.Parameter + i)).classList.add('c-jump-to-target-stay')
+                document.getElementById('c-code-i-' + (instruction.Parameter + i)).scrollIntoView({behavior: 'smooth'})
+              })
+              valueSpan.title = 'Scroll to target'
+              valueSpan.classList.add('c-jump-to-from')
+              
+              const newIcon = document.createElement('i')
+              if (instruction.Parameter > 0) {
+                newIcon.className = 'fa-solid fa-turn-down'
+              } else {
+                newIcon.className = 'fa-solid fa-turn-up'
+              }
+              valueSpan.appendChild(newIcon)
+            }
+          }
+
           newSpan.appendChild(valueSpan)
+          
+          const GetStackInfo = function() {
+            const basePointerValueElement = document.getElementById('stack-base-pointer-value')
+            /** @type {HTMLTableElement} */
+            const stackContentTable = document.querySelector('#stack-content>table')
+            const basePointerValueText = basePointerValueElement.textContent
+
+            const stackSize = stackContentTable.childElementCount - 1
+            const basePointer = Number.parseInt(basePointerValueText)
+
+            return {
+              size: stackSize,
+              basePointer: basePointer
+            }
+          }
+
+          /** @param {number} itemIndex @param {HTMLElement} element */
+          const HiglightStackItem = function(itemIndex, element) {
+            element.setAttribute('stack-higlighted-index', itemIndex)
+            element.classList.add('stack-higlighted-index-' + itemIndex)
+
+            const stackItem = document.getElementById('stack-row-i-' + itemIndex)
+            if (stackItem === null || stackItem === undefined) {
+              element.classList.add('stack-higlighted-error')
+              element.title = 'Stack element not exists'
+            } else {
+              stackItem.classList.add('stack-item-higlighted')
+              element.classList.add('stack-higlighted')
+              element.title = ''
+            }
+          }
+          /** @param {HTMLElement} element */
+          const NoHiglightStackItem = function(element) {
+            if (element.hasAttribute('stack-higlighted-index') !== true) { return }
+            const higlightedIndex = Number.parseInt(element.getAttribute('stack-higlighted-index'))
+            element.classList.remove('stack-higlighted-index-' + higlightedIndex)
+
+            const stackItem = document.getElementById('stack-row-i-' + higlightedIndex)
+            if (stackItem === null || stackItem === undefined) {
+
+            } else {
+              stackItem.classList.remove('stack-item-higlighted')
+            }
+            element.classList.remove('stack-higlighted')
+            element.classList.remove('stack-higlighted-error')
+            element.title = ''
+          }
+
+          if (instruction.Opcode === 'LOAD_VALUE' || instruction.Opcode === 'STORE_VALUE') {
+            newSpan.addEventListener('mouseenter', (e) => {
+              HiglightStackItem(instruction.Parameter, newItem)
+            })
+            newSpan.addEventListener('mouseleave', (e) => {
+              NoHiglightStackItem(newItem)
+            })
+
+            const newIcon = document.createElement('i')
+            newIcon.className = 'fa-solid fa-database'
+            newSpan.appendChild(newIcon)
+          } else if (instruction.Opcode === 'LOAD_VALUE_BR' || instruction.Opcode === 'STORE_VALUE_BR') {
+            newSpan.addEventListener('mouseenter', (e) => {
+              const stack = GetStackInfo()
+              HiglightStackItem(instruction.Parameter + stack.basePointer, newItem)
+            })
+            newSpan.addEventListener('mouseleave', (e) => {
+              NoHiglightStackItem(newItem)
+            })
+            
+            const newIcon = document.createElement('i')
+            newIcon.className = 'fa-solid fa-database'
+            newSpan.appendChild(newIcon)
+          } else if (instruction.Opcode === 'LOAD_VALUE_R' || instruction.Opcode === 'STORE_VALUE_R') {
+            newSpan.addEventListener('mouseenter', (e) => {
+              const stack = GetStackInfo()
+              HiglightStackItem(instruction.Parameter + stack.size, newItem)
+            })
+            newSpan.addEventListener('mouseleave', (e) => {
+              NoHiglightStackItem(newItem)
+            })
+            
+            const newIcon = document.createElement('i')
+            newIcon.className = 'fa-solid fa-database'
+            newSpan.appendChild(newIcon)
+          }
 
           if (instruction.AdditionParameter !== '' && instruction.AdditionParameter !== null) {
             newSpan.appendChild(CreateSpan('"' + instruction.AdditionParameter + '"', 'c-str'))
@@ -350,6 +493,22 @@ window.addEventListener('DOMContentLoaded', () => {
             newSpan.appendChild(CreateSpan(instruction.AdditionParameter, 'c-num'))
           }
         }
+
+        if (instruction.Tag !== '' && instruction.Tag !== null) {
+          newSpan.appendChild(CreateSpan(instruction.Tag, 'c-label-tag'))
+        }
+
+        document.body.addEventListener('mouseup', (e) => {
+          const list0 = document.getElementsByClassName('c-jump-to-target-stay')
+          const list1 = document.getElementsByClassName('c-jump-to-target')
+          const list2 = document.getElementsByClassName('c-jump-to-from-stay')
+          for (let i = 0; i < list0.length; i++)
+          { list0[i].classList.remove('c-jump-to-target-stay') }
+          for (let i = 0; i < list1.length; i++)
+          { list1[i].classList.remove('c-jump-to-target') }
+          for (let i = 0; i < list2.length; i++)
+          { list2[i].classList.remove('c-jump-to-from-stay') }
+        }, true); 
         
         newItem.appendChild(newSpan)
         eContentCode.appendChild(newItem)
@@ -379,6 +538,8 @@ window.addEventListener('DOMContentLoaded', () => {
       const contentContainer = document.getElementById('error-log-content').parentElement
       contentContainer.scrollTo(0, contentContainer.scrollHeight)
     }
+
+    console.log(data)
 
     if (typeof data === 'string') {
       if (data.trim().includes('\n')) {
@@ -581,6 +742,22 @@ const EnableButton = function(id) {
   document.getElementById(id).classList.remove('btn-disabled')
 }
 
+/** @param {string} iconPath @param {string} color @param {number} width @param {number} height */
+function GenerateCustomIcon(iconPath, color, width, height) {
+  const base = document.createElement('div')
+  base.style.webkitMaskImage = 'url("' + iconPath + '")'
+  base.style.webkitMaskRepeat = 'no-repeat'
+  base.style.webkitMaskSize = 'contain'
+
+  const child = document.createElement('div')
+  child.style.width = width + 'px'
+  child.style.height = height + 'px'
+  child.style.backgroundColor = color
+
+  base.appendChild(child)
+
+  return base
+}
 
 function GetDocumentTitle(baseID) {
   const base = document.getElementById(baseID)

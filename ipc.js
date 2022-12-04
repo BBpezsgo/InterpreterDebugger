@@ -68,14 +68,19 @@ class IPC extends EventEmitter {
             }
             
             if (self.rawInput.includes('\n')) {
+                var errorMessage = ''
                 while (self.rawInput.includes('\n')) {
                     const firstLine = self.rawInput.split('\n')[0]
                     self.rawInput = self.rawInput.substring(firstLine.length + 1)
                     try {
                         ParseLine(firstLine)
                     } catch (error) {
-                        console.log(error, firstLine)
+                        console.log(error, '\nMessage: ', firstLine)
+                        errorMessage += firstLine + '\n'
                     }
+                }
+                if (errorMessage !== '') {
+                    self.emit('unknown-message', errorMessage)
                 }
             } else {
                 console.log('Wait end of message')
@@ -86,11 +91,10 @@ class IPC extends EventEmitter {
                 ParseLine(self.rawInput)
                 return
             } catch (error) {
-                console.log(error, self.rawInput)
+                console.log(error, '\nMessage: ', self.rawInput)
             }
 
             self.emit('unknown-message', self.rawInput)
-            console.log('< [U] ', self.rawInput)
         })
 
         /** @type {{type:string;data:any}[]} */
