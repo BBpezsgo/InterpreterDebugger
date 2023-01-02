@@ -49,7 +49,7 @@ module.exports = class MainForm extends Form {
         })
         
         ipcMain.on('debug-step', e => {
-          processInterpreter.Send({ type: 'intp-update' })
+          processInterpreter.Send({ type: 'intp-update', data: null })
         })
         
         ipcMain.on('stop-debug', e => {
@@ -90,12 +90,12 @@ module.exports = class MainForm extends Form {
           if (processInterpreter.IsRunning() === false) { processInterpreter.Start(path, 'DEBUG') }
           
           setTimeout(() => {
-            processInterpreter.Send({ type: 'get-comp-res' })
+            processInterpreter.Send({ type: 'get-comp-res', data: null })
           }, 1000)
           
           this.dataInterval = setInterval(() => {
-            processInterpreter.Send({ type: 'get-intp-data' })
-            processInterpreter.Send({ type: 'get-intp2-data' })
+            processInterpreter.Send({ type: 'get-intp-data', data: null })
+            processInterpreter.Send({ type: 'get-intp2-data', data: null })
           }, 1000)
         }
         

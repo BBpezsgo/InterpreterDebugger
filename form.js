@@ -2,7 +2,7 @@ const { BrowserWindow } = require('electron')
 
 module.exports = class Form {
     constructor() {
-        /** @type {BrowserWindow} */
+        /** @type {BrowserWindow | null} */
         this.win = null
     }
 
@@ -21,6 +21,6 @@ module.exports = class Form {
     }
 
     Close() {
-        this.win.close()
+        this.win?.close()
     }
 }

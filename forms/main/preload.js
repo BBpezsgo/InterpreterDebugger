@@ -31,7 +31,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
       const newLi = document.createElement('li')
       newLi.addEventListener('click', (e) => {
-        document.getElementById('status-label').innerText = 'Start Process...'
+        document.getElementById('status-label').innerText = 'Start Process ...'
         DisableButton('start-debug')
         ipcRenderer.send('run-file', file)
       })
@@ -571,20 +571,20 @@ window.addEventListener('DOMContentLoaded', () => {
   ipcRenderer.send('get-files')
   
   OnButtonClick('start-debug', () => {
-    document.getElementById('status-label').innerText = 'Start Process...'
+    document.getElementById('status-label').innerText = 'Start Process ...'
     DisableButton('start-debug')
     ipcRenderer.send('start-debug')    
   })
   
   OnButtonClick('stop-debug', () => {
-    document.getElementById('status-label').innerText = 'Stop Process...'
+    document.getElementById('status-label').innerText = 'Stop Process ...'
     DisableButton('debug-step')
     DisableButton('stop-debug')
     ipcRenderer.send('stop-debug')    
   })
   
   OnButtonClick('debug-step', () => {
-    document.getElementById('status-label').innerText = 'Execute Next Instruction...'
+    document.getElementById('status-label').innerText = 'Execute Next Instruction ...'
     DisableButton('debug-step')
     DisableButton('stop-debug')
     ipcRenderer.send('debug-step')
