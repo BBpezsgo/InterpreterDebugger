@@ -14,3 +14,4 @@ output.dll
 Microsoft.CodeAnalysis.CSharp.dll
 System.CodeDom.dll
 Microsoft.CodeAnalysis.dll
+settings.json
