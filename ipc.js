@@ -20,9 +20,9 @@ class IPC extends EventEmitter {
         const runFile = file || settings.testFiles + 'test6.bbc'
 
         if (type === 'EDITOR') {
-            this.childProcess = spawn(settings.path, [ "-code-editor", runFile ])
+            this.childProcess = spawn(settings.path, [ "-code-editor", '"' + runFile + '"' ])
         } else if (type === 'DEBUG') {
-            this.childProcess = spawn(settings.path, [ "-debug", "-throw-errors", runFile ])
+            this.childProcess = spawn(settings.path, [ "-debug", "-throw-errors", '"' + runFile + '"' ])
         }
 
         this.childProcess.on('close', (code, signal) => {
