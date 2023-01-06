@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{ea0096e4-2d87-4815-aa96-c6cee1d1a050}</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <ProjectView>ShowAllFiles</ProjectView>
+    <ProjectView>ProjectFiles</ProjectView>
     <StartupFile>main.js</StartupFile>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -39,7 +39,11 @@
   <ItemGroup>
     <Folder Include=".vscode" />
     <Folder Include="forms" />
+    <Folder Include="forms\main\" />
+    <Folder Include="forms\setup\" />
     <Folder Include="gui" />
+    <Folder Include="gui\third-party\" />
+    <Folder Include="gui\third-party\images\" />
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="ipc.d.ts" />
