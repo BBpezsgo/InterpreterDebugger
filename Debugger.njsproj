@@ -17,41 +17,29 @@
   <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
   <ItemGroup>
     <Content Include=".gitignore" />
-    <Content Include="Debugger.njsproj" />
-    <Content Include="forge.config.js" />
-    <Content Include="gui\dock-style.css" />
-    <Content Include="gui\third-party\images\close.png" />
-    <Content Include="gui\third-party\images\icon-left.png" />
-    <Content Include="gui\third-party\images\icon-right.png" />
-    <Content Include="gui\third-party\images\icon-up.png" />
-    <Content Include="gui\third-party\images\pin.png" />
-    <Content Include="gui\third-party\images\pinned.png" />
-    <Content Include="gui\third-party\jquery-1.11.1.min.js" />
-    <Content Include="gui\third-party\jqx.base.css" />
-    <Content Include="gui\third-party\jqxcore.js" />
-    <Content Include="gui\third-party\jqxdockinglayout.js" />
-    <Content Include="gui\third-party\jqxlayout.js" />
-    <Content Include="gui\third-party\jqxribbon.js" />
-    <Content Include="gui\third-party\jqxwindow.js" />
+    <Content Include=".vscode/launch.json" />
+    <Content Include="editing.temp.txt" />
     <Content Include="icon.ico" />
+    <Content Include="make.bat" />
+    <Content Include="README.md" />
+    <Content Include="forge.config.js" />
+    <Content Include="form-main.js" />
+    <Content Include="form-setup.js" />
+    <Content Include="form.js" />
+    <Content Include="forms\**" />
+    <Content Include="gui\**" />
     <Content Include="ipc.js" />
     <Content Include="main.js" />
-    <Content Include="make.bat" />
-    <Content Include="package-lock.json" />
-    <Content Include="package.json" />
-    <Content Include="preload.js" />
-    <Content Include="README.md" />
     <Content Include="settings.js" />
     <Content Include="settings.json" />
     <Content Include="start.bat" />
-    <Content Include="gui\index.html" />
-    <Content Include="gui\script.js" />
-    <Content Include="gui\style.css" />
+    <Content Include="upload.bat" />
+    <Content Include="package.json" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include=".vscode" />
+    <Folder Include="forms" />
     <Folder Include="gui" />
-    <Folder Include="gui\third-party\" />
-    <Folder Include="gui\third-party\images\" />
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="ipc.d.ts" />
