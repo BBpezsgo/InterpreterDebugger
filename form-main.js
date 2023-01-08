@@ -18,11 +18,21 @@ module.exports = class MainForm extends Form {
         
         const self = this
 
+        var waitForInstructionIndex = -1
+
         ipcMain.on('on-loaded', e => {
           processInterpreter.on('message', function(message) {
             if (self.win === null) { return }
-            if (message.type === 'con-out' || message.type === 'intp-data' || message.type === 'intp2-data' || message.type === 'comp-res' || message.type === 'started') {
-                self.win.webContents.send(message.type, message.data)
+            if (message.type === 'con-out' || message.type === 'intp-data' || message.type === 'intp2-data' || message.type === 'comp-res' || message.type === 'started' || message.type === 'stdout' || message.type === 'stderr') {
+              if (message.type === 'intp-data' && waitForInstructionIndex !== -1) {
+                if (message.data.CodePointer === waitForInstructionIndex) {
+                  waitForInstructionIndex = -1
+                } else {
+                  processInterpreter.Send({ type: 'intp-update', data: null })
+                }
+              }
+              self.win.webContents.send(message.type, message.data)
+              self.win.webContents.send('wait-for-instruction-index-v', waitForInstructionIndex)
             }
           })
           
@@ -60,6 +70,14 @@ module.exports = class MainForm extends Form {
             this.win.webContents.openDevTools({
                 mode: 'undocked'
             })
+        })
+        
+        ipcMain.on('stdin', (e, key) => {
+          processInterpreter.Send({ type: 'stdin', data: key })
+        })
+        
+        ipcMain.on('wait-instruction-index', (e, i) => {
+          waitForInstructionIndex = i
         })
         
         ipcMain.on('get-files', e => {

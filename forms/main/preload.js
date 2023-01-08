@@ -16,6 +16,8 @@ window.addEventListener('DOMContentLoaded', () => {
 
   document.querySelector('#stack-content table').innerHTML = ''
 
+  var waitForInstructionIndexI = -1
+
   for (const type of ['chrome', 'node', 'electron']) {
     replaceText(`${type}-version`, process.versions[type])
   }
@@ -89,6 +91,62 @@ window.addEventListener('DOMContentLoaded', () => {
     contentContainer.parentElement.scrollTo(0, contentContainer.parentElement.scrollHeight)
   })
 
+  ipcRenderer.on('stdout', (e, args) => {
+    const content = document.querySelector('#output-content ul')
+
+    const AddLine = function(line, className) {
+      const newLi = document.createElement('li')
+      newLi.className = className
+  
+      const newSpan = document.createElement('span')
+      newSpan.textContent = line
+      newLi.appendChild(newSpan)
+  
+      content.appendChild(newLi)
+    }
+
+    if (args.trim().includes('\n')) {
+      const lines = args.trim().split('\n')
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i]
+        if (line.trim().length === 0) { continue }
+        AddLine(line, 'console-log-' + 'normal')
+      }
+    } else {
+      AddLine(args, 'console-log-' + 'normal')
+    }
+    
+    contentContainer.parentElement.scrollTo(0, contentContainer.parentElement.scrollHeight)
+  })
+
+  ipcRenderer.on('stderr', (e, args) => {
+    const content = document.querySelector('#output-content ul')
+
+    const AddLine = function(line, className) {
+      const newLi = document.createElement('li')
+      newLi.className = className
+  
+      const newSpan = document.createElement('span')
+      newSpan.textContent = line
+      newLi.appendChild(newSpan)
+  
+      content.appendChild(newLi)
+    }
+
+    if (args.trim().includes('\n')) {
+      const lines = args.trim().split('\n')
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i]
+        if (line.trim().length === 0) { continue }
+        AddLine(line, 'console-log-' + 'error')
+      }
+    } else {
+      AddLine(args, 'console-log-' + 'error')
+    }
+    
+    contentContainer.parentElement.scrollTo(0, contentContainer.parentElement.scrollHeight)
+  })
+
   ipcRenderer.on('intp2-data', (e, data) => {
     /**
      @type {{
@@ -128,9 +186,13 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     EnableButton('stop-debug')
-    if (Interpeter.State !== 'CodeExecuted') {
+    if (Interpeter.State !== 'CodeExecuted' && waitForInstructionIndexI === -1) {
       EnableButton('debug-step')
     }
+  })
+
+  ipcRenderer.on('wait-for-instruction-index-v', (e, i) => {
+    waitForInstructionIndexI = i
   })
 
   ipcRenderer.on('intp-data', (e, data) => {
@@ -334,6 +396,9 @@ window.addEventListener('DOMContentLoaded', () => {
         newItem.id = 'c-code-i-' + i
 
         const lineNumber = CreateSpan(i.toString(), 'c-line-number')
+        lineNumber.addEventListener('click', (e) => {
+          ipcRenderer.send('wait-instruction-index', i)
+        })
         newItem.appendChild(lineNumber)
 
         const newSpan = CreateSpan('', '')
@@ -720,6 +785,20 @@ window.addEventListener('DOMContentLoaded', () => {
     
     const resultElement = document.querySelector("#highlighting-content")
     resultElement.innerHTML = result
+  })
+
+  /** @type {HTMLInputElement} */
+  const StdIn = document.getElementById('output-input-box')
+  StdIn.addEventListener('keydown', (e) => {
+    StdIn.value = ''
+    if (e.key === 'Enter') {
+      ipcRenderer.send('stdin', '\n')
+      return
+    }
+    if (e.key.length !== 1) {
+      return
+    }
+    ipcRenderer.send('stdin', e.key)
   })
 })
 
