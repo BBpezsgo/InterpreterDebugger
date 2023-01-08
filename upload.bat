@@ -1,5 +1,10 @@
+chcp 65001
 @echo off
-set from=".\out\make\squirrel.windows\x64\interpeter-debugger-1.0.0 Setup.exe"
-set to="C:\Users\bazsi\OneDrive\Download Content"
-echo Copy %from% to %to%
-copy %from% %to%
+set source=".\out\make\squirrel.windows\x64\interpeter-debugger-1.0.0 Setup.exe"
+set onedrive="C:\Users\bazsi\OneDrive\Download Content"
+set googledrive="C:\Users\bazsi\Saját meghajtó\Download Content"
+echo Copy to OneDrive ...
+copy %source% %onedrive%
+echo Copy to Google Drive ...
+copy %source% %googledrive%
+echo Done
