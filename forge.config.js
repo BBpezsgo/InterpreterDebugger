@@ -1,14 +1,20 @@
 module.exports = {
-  packagerConfig: {},
+  packagerConfig: {  
+    icon: './icon',
+  },
   rebuildConfig: {},
   makers: [
     {
       name: '@electron-forge/maker-squirrel',
-      config: {},
+      config: {
+        setupIcon: './icon.ico',
+        noMsi: false,
+      },
     },
     {
       name: '@electron-forge/maker-zip',
       platforms: ['darwin'],
+      config: {},
     },
     {
       name: '@electron-forge/maker-deb',
