@@ -4,11 +4,6 @@ out/
 make.bat
 bin/
 obj/
-BBCode.deps.json
-BBCode.dll
-BBCode.exe
-BBCode.pdb
-BBCode.runtimeconfig.json
 editing.temp.txt
 output.dll
 Microsoft.CodeAnalysis.CSharp.dll
@@ -16,3 +11,8 @@ System.CodeDom.dll
 Microsoft.CodeAnalysis.dll
 /settings.json
 output.bin
+/BBCodeInterpreter.deps.json
+/BBCodeInterpreter.dll
+/BBCodeInterpreter.exe
+/BBCodeInterpreter.pdb
+/BBCodeInterpreter.runtimeconfig.json
