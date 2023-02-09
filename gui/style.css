@@ -158,6 +158,15 @@
   outline: 2px solid #c42424;
 }
 
+#code-content .heap-higlighted > span:not(.c-line-number) {
+  background-color: #c471247e;
+  outline: 2px solid #c47124;
+}
+#code-content .heap-higlighted-error > span:not(.c-line-number) {
+  background-color: #c424247e;
+  outline: 2px solid #c42424;
+}
+
 #code-content .c-label-tag {
   color: #555;
   user-select: none;
@@ -329,6 +338,113 @@
   transform: translate(1px, 1px);
 }
 #stack-content .stack-label-var > div > div {
+  background-color: #999 !important;
+}
+
+#heap-content table {
+  width: 100%;
+  padding: 0;
+  border-collapse: collapse;
+}
+
+#heap-content table tr:first-child > th:first-child {
+  width: 30px;
+}
+
+#heap-content table tr,
+#heap-content table td,
+#heap-content table th {
+  margin: 0;
+}
+
+#heap-content td {
+  border: 2px solid #444;
+  background-color: #ffffff05;
+  height: 21px;
+}
+
+#heap-content table .heap-item-higlighted {
+  background-color: #c4712462 !important;
+  border-color: #c47124 !important;
+  outline: 1px solid #c47124;
+}
+#heap-content table .heap-item-higlighted td {
+  border-color: #c47124 !important;
+}
+
+#heap-content table tr td:first-child span {
+  color: #365b70;
+  user-select: none;
+  float: right;
+  margin-right: 2px;
+}
+
+#heap-content table tr td:last-child span,
+#heap-content table tr td:last-child i {
+  margin-left: 4px;
+}
+
+#heap-content table tr td i {
+  transform: translate(1px, 1px);
+}
+
+#heap-content table tr td:first-child i {
+  float: left;
+}
+
+#heap-content table tr > td > span {
+  display: inline-block;
+}
+
+#heap-content table tr > td > i.st-base-pointer {
+  color: #555555;
+}
+#heap-content table tr > td > i.st-base-pointer.st-base-pointer-active {
+  color: #3673c4 !important;
+}
+#heap-content table tr > td > i.st-return-value {
+  color: #999;
+  border: 1px solid #fff2;
+  background-color: #fff1;
+  height: 11px;
+  padding: 1px 1px 2px 1px;
+}
+#heap-content table tr > td > i.st-return-value:before {
+  font-size: 12px;
+}
+#heap-content table tr > td > i.st-return-value.st-return-value-active {
+  color: #3673c4 !important;
+}
+
+#heap-content .st-num {
+  color: #73ca94;
+}
+
+#heap-content .st-str {
+  color: #ad7b5a;
+}
+
+#heap-content .st-bool {
+  color: #18408a;
+}
+
+#heap-content .st-tag {
+  color: #555555;
+}
+
+#heap-content .heap-label-var {
+  border: 1px solid #fff2;
+  background-color: #fff1;
+  color: #999;
+  height: 1em;
+  padding: 0px 2px 1px 2px;
+}
+#heap-content .heap-label-var > div {
+  width: 1em;
+  height: 1em;
+  transform: translate(1px, 1px);
+}
+#heap-content .heap-label-var > div > div {
   background-color: #999 !important;
 }
 

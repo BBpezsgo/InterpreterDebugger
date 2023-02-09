@@ -205,6 +205,13 @@ window.addEventListener('DOMContentLoaded', () => {
         Value: string | 'null'
         Type: 'INT'|'FLOAT'|'STRING'|'BOOLEAN'|'STRUCT'|'LIST'|'RUNTIME'
         Tag: string | null
+        IsHeapAddress: boolean
+      }[]
+      Heap: {
+        Value: string | 'null'
+        Type: 'INT'|'FLOAT'|'STRING'|'BOOLEAN'|'STRUCT'|'LIST'|'RUNTIME'
+        Tag: string | null
+        IsHeapAddress: boolean
       }[]
      }}
      */
@@ -238,13 +245,105 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     /** @type {HTMLTableElement} */
+    const heapContent = document.querySelector('#heap-content table')
+    heapContent.innerHTML = ''
+    
+    const headerRow0 = document.createElement('tr')
+    headerRow0.appendChild(document.createElement('th'))
+    headerRow0.appendChild(document.createElement('th'))
+    heapContent.appendChild(headerRow0)
+
+    for (let i = 0; i < Interpeter.Heap.length; i++) {
+      const item = Interpeter.Heap[i]
+      const newRow = document.createElement('tr')
+      newRow.id = 'heap-row-i-' + i
+
+      const cell0 = document.createElement('td')
+      const cell1 = document.createElement('td')
+
+      if (Interpeter.BasePointer === i) {
+        const newI = document.createElement('i')
+        newI.className = 'fa-sharp fa-solid fa-caret-right st-base-pointer st-base-pointer-active'
+        newI.title = 'Base Pointer'
+        cell0.appendChild(newI)
+        basePointerShown = true
+      }
+
+      cell0.appendChild(CreateSpan(i.toString(), ''))
+
+      if (item.Type === 'INT' || item.Type === 'FLOAT') {
+        cell1.appendChild(CreateSpan(item.Value, 'st-num'))
+      } else if (item.Type === 'STRING') {
+        cell1.appendChild(CreateSpan('"' + item.Value + '"', 'st-str'))
+      } else if (item.Type === 'BOOLEAN') {
+        cell1.appendChild(CreateSpan(item.Value, 'st-bool'))
+      } else if (item.Type === 'STRUCT') {
+        cell1.appendChild(CreateSpan('{ ... }', ''))
+      } else if (item.Type === 'LIST') {
+        cell1.appendChild(CreateSpan('[ ... ]', ''))
+      } else {
+        cell1.appendChild(CreateSpan(item.Value, 'st-param'))
+      }
+
+      if (item.Tag !== null) {
+        if (item.Tag === 'return value' && i < Interpeter.BasePointer) {
+          const newI = document.createElement('i')
+          newI.className = 'fa-solid fa-share st-return-value'
+          newI.title = 'Return Value'
+          newI.style.transform = 'rotate(-90deg)'
+          cell1.appendChild(newI)
+          lastReturnValueIcon = newI
+        } else if (item.Tag === 'saved base pointer') {
+          const newI = document.createElement('i')
+          newI.className = 'fa-sharp fa-solid fa-caret-right st-base-pointer'
+          newI.title = 'Saved Base Pointer'
+          try {
+            heapContent.querySelectorAll('tr')[Number.parseInt(item.Value)+1].querySelector('td').appendChild(newI)
+          } catch (err) { }
+          cell1.appendChild(CreateSpan(item.Tag, 'st-tag'))
+        } else if (item.Tag.startsWith('var.')) {
+          const varName = item.Tag.substring(4)
+          const newElement = document.createElement('span')
+          const newIcon = GenerateCustomIcon('../../gui/var.png', '#f00', 16, 16)
+          newIcon.style.display = 'inline-block'
+          newElement.appendChild(newIcon)
+          newElement.appendChild(CreateSpan(varName, ''))
+          newElement.className = 'heap-label-var'
+          newElement.title = 'Variable'
+          cell1.appendChild(newElement)
+        } else if (item.Tag.startsWith('param.') && i < Interpeter.BasePointer) {
+          const varName = item.Tag.substring(6)
+          const newElement = document.createElement('span')
+          const newIcon = GenerateCustomIcon('../../gui/var.png', '#f00', 16, 16)
+          newIcon.style.display = 'inline-block'
+          newElement.appendChild(newIcon)
+          newElement.appendChild(CreateSpan(varName, ''))
+          newElement.className = 'heap-label-var'
+          newElement.title = 'Parameter'
+          cell1.appendChild(newElement)
+        } else {
+          cell1.appendChild(CreateSpan(item.Tag, 'st-tag'))
+        }
+      }
+
+      newRow.appendChild(cell0)
+      newRow.appendChild(cell1)
+
+      if (document.getElementsByClassName('heap-higlighted-index-' + i).length > 0) {
+        newRow.classList.add('heap-item-higlighted')
+      }
+    
+      heapContent.appendChild(newRow)
+    }
+
+    /** @type {HTMLTableElement} */
     const stackContent = document.querySelector('#stack-content table')
     stackContent.innerHTML = ''
 
-    const headerRow = document.createElement('tr')
-    headerRow.appendChild(document.createElement('th'))
-    headerRow.appendChild(document.createElement('th'))
-    stackContent.appendChild(headerRow)
+    const headerRow1 = document.createElement('tr')
+    headerRow1.appendChild(document.createElement('th'))
+    headerRow1.appendChild(document.createElement('th'))
+    stackContent.appendChild(headerRow1)
 
     var lastReturnValueIcon = null
 
