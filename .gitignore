@@ -16,3 +16,9 @@ output.bin
 /BBCodeInterpreter.exe
 /BBCodeInterpreter.pdb
 /BBCodeInterpreter.runtimeconfig.json
+Data Utilities.deps.json
+Data Utilities.dll
+Data Utilities.pdb
+Data Utilities.exe
+Data Utilities.runtimeconfig.json
+output.txt
